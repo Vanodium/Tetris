@@ -13,7 +13,7 @@ const initializeGame = () => {
         container.classList.add('visible');
         initGrid();
         scoreTicker();
-        requestAnimationFrame(() => loop(Array(ROWS).fill().map(() => Array(COLS).fill(0))))
+        requestAnimationFrame(loop)
         return () => {
             clearInterval(scoreTicker);
         };
