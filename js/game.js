@@ -10,7 +10,7 @@ function loop() {
         return;
     }
     
-    if (SCORE % 5 === 0 && !loop.lastTriggerScore) {
+    if (SCORE % 10 === 0 && !loop.lastTriggerScore) {
         const tetromino = getRandomTetromino();
         const startX = Math.floor((COLS - tetromino[0].length) / 2);
         const startY = 0;
@@ -34,10 +34,10 @@ function loop() {
             }
         }
         loop.lastTriggerScore = true;
-    } else if (SCORE % 5 !== 0) {
+    } else if (SCORE % 10 !== 0) {
         loop.lastTriggerScore = false;
     }
-    if (SCORE % 5 === 4) {
+    if (SCORE % 10 === 8) {
         while (currentTetromino.length > 0) {
             gameField = fallingTetromino(gameField, ROWS);
         }
@@ -51,35 +51,7 @@ function loop() {
     }
     rAF = requestAnimationFrame(loop);
 }
-function handleKeyPress(event) {
-    if (!currentTetromino.length) return;
 
-    const moveAmount = event.key === 'ArrowLeft' ? -1 : event.key === 'ArrowRight' ? 1 : 0;
-    if (!moveAmount || currentTetromino.length === 0) return;
 
-    for (let i = 0; i < currentTetromino.length; i++) {
-        const [y, x] = currentTetromino[i];
-        const newX = x + moveAmount;
-        
-        if (newX < 0 || newX >= COLS || (newX >= 0 && gameField[y][newX] === 1 && !currentTetromino.some(([ty, tx]) => ty === y && tx === newX))) {
-            return;
-        }
-    }
-    // alert(moveAmount);
-
-    for (let i = 0; i < currentTetromino.length; i++) {
-        const [y, x] = currentTetromino[i];
-        gameField[y][x] = 0;
-    }
-
-    for (let i = 0; i < currentTetromino.length; i++) {
-        const [y, x] = currentTetromino[i];
-        currentTetromino[i][1] = x + moveAmount;
-        gameField[y][x + moveAmount] = 1;
-    }
-}
-
-document.addEventListener('keydown', (e) => handleKeyPress(e));
-
-export { COLS, ROWS };
+export { COLS, ROWS, gameField };
 export default loop;

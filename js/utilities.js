@@ -57,7 +57,7 @@ const initGrid = () => {
     }
 }
 
-const scoreTicker = (initDelay = 1000) => {
+const scoreTicker = (initDelay = 500) => {
     let delay = initDelay;
     const tick = () => {
         const scoreDisplay = document.getElementById('score');
@@ -70,7 +70,8 @@ const scoreTicker = (initDelay = 1000) => {
 };
 
 const getRandomTetromino = () => {
-    return tetrominos[Math.floor(Math.random() * tetrominos.length)];
+    // return tetrominos[Math.floor(Math.random() * tetrominos.length)];
+    return tetrominos[0];
 };
 
 const fallingTetromino = (gameField, ROWS) => {
@@ -94,4 +95,79 @@ const fallingTetromino = (gameField, ROWS) => {
     return newField
 
 }
-export { initGrid, scoreTicker, SCORE, tetrominos, getRandomTetromino, fallingTetromino, currentTetromino };
+
+function moveTetromino(moveAmount, COLS, gameField) {
+    for (let i = 0; i < currentTetromino.length; i++) {
+        const [y, x] = currentTetromino[i];
+        const newX = x + moveAmount;
+        
+        if (newX < 0 || newX >= COLS || (newX >= 0 && gameField[y][newX] === 1 && !currentTetromino.some(([ty, tx]) => ty === y && tx === newX))) {
+            return;
+        }
+    }
+
+    for (let i = 0; i < currentTetromino.length; i++) {
+        const [y, x] = currentTetromino[i];
+        gameField[y][x] = 0;
+    }
+
+    for (let i = 0; i < currentTetromino.length; i++) {
+        const [y, x] = currentTetromino[i];
+        currentTetromino[i][1] = x + moveAmount;
+        gameField[y][x + moveAmount] = 1;
+    }
+}
+
+function rotateTetromino(gameField) {
+    // Clear current position
+    for (let i = 0; i < currentTetromino.length; i++) {
+        const [y, x] = currentTetromino[i];
+        gameField[y][x] = 0;
+    }
+
+    // Calculate new rotated positions
+    const rotated = mapRotation(currentTetromino);
+    
+    // Check if rotation is valid (within bounds and no collisions)
+    const isValid = rotated.every(([y, x]) => 
+        y >= 0 && y < gameField.length &&
+        x >= 0 && x < gameField[0].length &&
+        gameField[y][x] === 0
+    );
+
+    // Apply rotation if valid
+    if (isValid) {
+        currentTetromino = rotated;
+    }
+
+    // Update game field with new positions
+    for (let i = 0; i < currentTetromino.length; i++) {
+        const [y, x] = currentTetromino[i];
+        gameField[y][x] = 1;
+    }
+}
+
+function mapRotation(tetromino) {
+    if (tetromino.length === 0 || (tetromino[0][1] === tetromino[2][1] && tetromino[0][0] === tetromino[2][0])) return tetromino;
+    let center;
+    if (tetromino.every(([y, _]) => y === tetromino[0][0])) {
+        center = tetromino[Math.floor((tetromino.length - 1) / 2)];
+    } else {
+        center = tetromino[Math.floor((tetromino.length) / 2)];
+    }
+    
+    return tetromino.map(([y, x]) => {
+        const dy = y - center[0];
+        const dx = x - center[1];
+        
+        const newDy = dx;
+        const newDx = -dy;
+        
+        return [
+            center[0] + newDy,
+            center[1] + newDx
+        ];
+    });
+}
+
+export { initGrid, scoreTicker, SCORE, tetrominos, getRandomTetromino, fallingTetromino, currentTetromino, moveTetromino, rotateTetromino };
