@@ -6,6 +6,7 @@ let GAME_OVER = false;
 let rAF;
 let gameField = Array(ROWS).fill().map(() => Array(COLS).fill(0));
 let lastTriggerScore = false;
+let loss = false;
 
 function loop() {
     if (GAME_OVER) {
@@ -13,7 +14,12 @@ function loop() {
     }
     
     if (SCORE % 10 === 0 && !lastTriggerScore) {
-        spawnNewTetromino(gameField, COLS, rAF);
+        loss = spawnNewTetromino(gameField, COLS);
+        if (loss) {
+            cancelAnimationFrame(rAF);
+            GAME_OVER = true;
+            window.location.reload();
+        }
         lastTriggerScore = true;
     } else if (SCORE % 10 !== 0) {
         lastTriggerScore = false;

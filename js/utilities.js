@@ -82,7 +82,7 @@ const getRandomTetromino = () => {
     return tetrominos[Math.floor(Math.random() * tetrominos.length)];
 };
 
-const spawnNewTetromino = (gameField, COLS, rAF) => {
+const spawnNewTetromino = (gameField, COLS) => {
     const tetromino = getRandomTetromino();
     const startX = Math.floor((COLS - tetromino[0].length) / 2);
     const startY = 0;
@@ -90,10 +90,7 @@ const spawnNewTetromino = (gameField, COLS, rAF) => {
         for (let x = 0; x < tetromino[y].length; x++) {
             if (tetromino[y][x] && gameField[startY + y][startX + x]) {
                 alert('Score: ' + SCORE);
-                cancelAnimationFrame(rAF);
-                GAME_OVER = true;
-                window.location.reload();
-                return;
+                return true;
             }
         }
     }
@@ -105,6 +102,7 @@ const spawnNewTetromino = (gameField, COLS, rAF) => {
             }
         }
     }
+    return false;
 }
 const fallingTetromino = (gameField, ROWS) => {
     let newField = gameField;
