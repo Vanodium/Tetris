@@ -1,4 +1,4 @@
-import { SCORE, getRandomTetromino, fallingTetromino, currentTetromino } from './utilities.js';
+import { SCORE, getRandomTetromino, fallingTetromino, currentTetromino, findFullRows, removeFullRows } from './utilities.js';
 const COLS = 10;
 const ROWS = 20;
 let GAME_OVER = false;
@@ -41,6 +41,7 @@ function loop() {
         while (currentTetromino.length > 0) {
             gameField = fallingTetromino(gameField, ROWS);
         }
+        gameField = removeFullRows(gameField, findFullRows(gameField), COLS);
     }
     
     for (let y = 0; y < ROWS; y++) {
@@ -51,7 +52,6 @@ function loop() {
     }
     rAF = requestAnimationFrame(loop);
 }
-
 
 export { COLS, ROWS, gameField };
 export default loop;

@@ -60,18 +60,17 @@ const initGrid = () => {
 const scoreTicker = (initDelay = 500) => {
     let delay = initDelay;
     const tick = () => {
-        const scoreDisplay = document.getElementById('score');
+        const scoreDisplay = document.getElementById('score-value');
         SCORE++;
-        scoreDisplay.textContent = SCORE;
-        delay *= 0.99;
+        scoreDisplay.textContent = `${SCORE}`;
+        delay *= 0.995;
         setTimeout(tick, delay);
     };
     setTimeout(tick, delay);
 };
 
 const getRandomTetromino = () => {
-    // return tetrominos[Math.floor(Math.random() * tetrominos.length)];
-    return tetrominos[0];
+    return tetrominos[Math.floor(Math.random() * tetrominos.length)];
 };
 
 const fallingTetromino = (gameField, ROWS) => {
@@ -170,4 +169,33 @@ function mapRotation(tetromino) {
     });
 }
 
-export { initGrid, scoreTicker, SCORE, tetrominos, getRandomTetromino, fallingTetromino, currentTetromino, moveTetromino, rotateTetromino };
+const findFullRows = (gameField) => {
+    let fullRows = [];
+    for (let i = 0; i < gameField.length; i++) {
+        if (gameField[i].every(cell => cell === 1)) {
+            fullRows.push(i);
+        }
+    }
+    return fullRows;
+}
+
+const removeFullRows = (gameField, fullRows, COLS) => {
+    let newField = []
+    for (let i = 0; i < fullRows.length; i++) {
+        newField.push(new Array(COLS).fill(0))
+    }
+    for (let i = 0; i < gameField.length; i++) {
+        if (!fullRows.includes(i)) {
+            newField.push(gameField[i])
+        }
+    }
+    return newField;
+}
+
+const speedUp = () => {
+    if (SCORE % 10 < 7) {
+        SCORE += 7 - (SCORE % 10);
+    }
+}
+
+export { initGrid, scoreTicker, SCORE, tetrominos, getRandomTetromino, fallingTetromino, currentTetromino, moveTetromino, rotateTetromino, speedUp, findFullRows, removeFullRows };
