@@ -70,13 +70,13 @@ const scoreTicker = (initDelay = 500) => {
 };
 
 const updateField = (gameField, ROWS, COLS) => {
-    for (let y = 0; y < ROWS; y++) {
-        for (let x = 0; x < COLS; x++) {
-            const square = document.getElementById(`square-${y * COLS + x+1}`);
-            square.style.opacity = gameField[y][x] === 0 ? '0.1' : '1';
-        }
-    }
-}
+    return gameField.reduce((_, row, y) => {
+        row.reduce((_, cell, x) => {
+            const square = document.getElementById(`square-${y * COLS + x + 1}`);
+            square.style.opacity = cell === 0 ? '0.1' : '1';
+        }, null);
+    }, null);
+};
 
 const getRandomTetromino = () => {
     return tetrominos[Math.floor(Math.random() * tetrominos.length)];
@@ -209,20 +209,15 @@ const findFullRows = (gameField) => {
 }
 
 const removeFullRows = (gameField, fullRows, COLS) => {
-    let newField = []
-    for (let i = 0; i < fullRows.length; i++) {
-        newField.push(new Array(COLS).fill(0))
-    }
-    for (let i = 0; i < gameField.length; i++) {
-        if (!fullRows.includes(i)) {
-            newField.push(gameField[i])
-        }
-    }
     if (fullRows.length > 0) {
         glowAnimation('gameCanvas');
     }
-    return newField;
-}
+    
+    return [
+        ...Array(fullRows.length).fill().map(() => Array(COLS).fill(0)),
+        ...gameField.filter((_, index) => !fullRows.includes(index))
+    ];
+};
 
 const speedUp = () => {
     shakeAnimation('score-value');
