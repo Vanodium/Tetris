@@ -58,15 +58,20 @@ const initGrid = () => {
 }
 
 const scoreTicker = (initDelay = 500) => {
-    let delay = initDelay;
-    const tick = () => {
-        const scoreDisplay = document.getElementById('score-value');
-        SCORE++;
-        scoreDisplay.textContent = `${SCORE}`;
-        delay *= 0.995;
+    return new Promise((resolve) => {
+        let delay = initDelay;
+        
+        const tick = () => {
+            const scoreDisplay = document.getElementById('score-value');
+            SCORE++;
+            scoreDisplay.textContent = `${SCORE}`;
+            delay *= 0.995;
+            
+            setTimeout(tick, delay);
+        };
+        
         setTimeout(tick, delay);
-    };
-    setTimeout(tick, delay);
+    });
 };
 
 const updateField = (gameField, ROWS, COLS) => {
@@ -176,10 +181,12 @@ function rotateTetromino(gameField) {
 }
 
 function mapRotation(tetromino) {
-    if (tetromino.length === 0 || (tetromino[0][1] === tetromino[2][1] && tetromino[0][0] === tetromino[2][0])) return tetromino;
+    if (tetromino.length === 0 || (tetromino[0][1] === tetromino[2][1] && tetromino[0][0] === tetromino[1][0])) return tetromino;
     let center;
     if (tetromino.every(([y, _]) => y === tetromino[0][0])) {
         center = tetromino[Math.floor((tetromino.length - 1) / 2)];
+    } else if ((tetromino[0][0] === tetromino[1][0] && tetromino[2][0] === tetromino[3][0] && tetromino[0][1] === tetromino[3][1] ) || (tetromino[0][0] === tetromino[3][0] && tetromino[2][1] === tetromino[3][1])) {
+        center = tetromino[3];
     } else {
         center = tetromino[Math.floor((tetromino.length) / 2)];
     }
