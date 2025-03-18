@@ -69,10 +69,43 @@ const scoreTicker = (initDelay = 500) => {
     setTimeout(tick, delay);
 };
 
+const updateField = (gameField, ROWS, COLS) => {
+    for (let y = 0; y < ROWS; y++) {
+        for (let x = 0; x < COLS; x++) {
+            const square = document.getElementById(`square-${y * COLS + x+1}`);
+            square.style.opacity = gameField[y][x] === 0 ? '0.1' : '1';
+        }
+    }
+}
+
 const getRandomTetromino = () => {
     return tetrominos[Math.floor(Math.random() * tetrominos.length)];
 };
 
+const spawnNewTetromino = (gameField, COLS, rAF) => {
+    const tetromino = getRandomTetromino();
+    const startX = Math.floor((COLS - tetromino[0].length) / 2);
+    const startY = 0;
+    for (let y = 0; y < tetromino.length; y++) {
+        for (let x = 0; x < tetromino[y].length; x++) {
+            if (tetromino[y][x] && gameField[startY + y][startX + x]) {
+                alert('Score: ' + SCORE);
+                cancelAnimationFrame(rAF);
+                GAME_OVER = true;
+                window.location.reload();
+                return;
+            }
+        }
+    }
+    for (let y = 0; y < tetromino.length; y++) {
+        for (let x = 0; x < tetromino[y].length; x++) {
+            if (tetromino[y][x]) {
+                gameField[startY + y][startX + x] = tetromino[y][x];
+                currentTetromino.push([startY + y, startX + x]);
+            }
+        }
+    }
+}
 const fallingTetromino = (gameField, ROWS) => {
     let newField = gameField;
     for (let i = 0; i < currentTetromino.length; i++) {
@@ -124,22 +157,20 @@ function rotateTetromino(gameField) {
         gameField[y][x] = 0;
     }
 
-    // Calculate new rotated positions
     const rotated = mapRotation(currentTetromino);
     
-    // Check if rotation is valid (within bounds and no collisions)
+    // Check if rotation is valid
     const isValid = rotated.every(([y, x]) => 
         y >= 0 && y < gameField.length &&
         x >= 0 && x < gameField[0].length &&
         gameField[y][x] === 0
     );
 
-    // Apply rotation if valid
     if (isValid) {
         currentTetromino = rotated;
     }
 
-    // Update game field with new positions
+    // Add the tetromino to the game field
     for (let i = 0; i < currentTetromino.length; i++) {
         const [y, x] = currentTetromino[i];
         gameField[y][x] = 1;
@@ -154,7 +185,7 @@ function mapRotation(tetromino) {
     } else {
         center = tetromino[Math.floor((tetromino.length) / 2)];
     }
-    
+    // rotate the tetromino matrix 90 degrees clockwise
     return tetromino.map(([y, x]) => {
         const dy = y - center[0];
         const dx = x - center[1];
@@ -189,13 +220,42 @@ const removeFullRows = (gameField, fullRows, COLS) => {
             newField.push(gameField[i])
         }
     }
+    if (fullRows.length > 0) {
+        glowAnimation('gameCanvas');
+    }
     return newField;
 }
 
 const speedUp = () => {
-    if (SCORE % 10 < 7) {
-        SCORE += 7 - (SCORE % 10);
+    shakeAnimation('score-value');
+    if (SCORE % 10 < 8) {
+        SCORE += 8 - (SCORE % 10);
     }
 }
 
-export { initGrid, scoreTicker, SCORE, tetrominos, getRandomTetromino, fallingTetromino, currentTetromino, moveTetromino, rotateTetromino, speedUp, findFullRows, removeFullRows };
+const shakeAnimation = (id) => {
+    const scoreValue = document.getElementById(id);
+    scoreValue.style.transition = 'transform 0.1s ease-in-out';
+    scoreValue.style.transform = 'scale(1.2)';
+    setTimeout(() => {
+        scoreValue.style.transform = 'scale(1)';
+    }, 100);
+}
+
+const glowAnimation = (id) => {
+    const element = document.getElementById(id);
+    element.style.transition = 'all 0.2s ease-out';
+    element.style.transform = 'scale(1.02)';
+    element.style.filter = 'brightness(1.5)';
+    element.style.textShadow = '0 0 20px #00ff00, 0 0 40px #00ff00';
+    element.style.boxShadow = '0 0 30px rgba(0, 255, 0, 0.5)';
+    
+    setTimeout(() => {
+        element.style.transform = 'scale(1)';
+        element.style.filter = 'brightness(0.8)';
+        element.style.textShadow = 'none';
+        element.style.boxShadow = 'none';
+    }, 200);
+}
+
+export { initGrid, scoreTicker, SCORE, tetrominos, getRandomTetromino, spawnNewTetromino, fallingTetromino, currentTetromino, moveTetromino, rotateTetromino, speedUp, findFullRows, removeFullRows, shakeAnimation, glowAnimation, updateField };
