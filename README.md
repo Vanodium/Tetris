@@ -1,10 +1,9 @@
-# Browser Game
+# The Vintage Tetris Game <img align="left" width="300" src="https://github.com/user-attachments/assets/d527320f-2822-47ea-a910-c4d0c9c88d9a">
 
-A simple browser-based game built with vanilla JavaScript.
+Pure HTML / CSS / JS
 
-## Features
-
-- Responsive canvas with retina display support
-- Game loop with delta time for smooth animations
-- Score tracking
-- Start/Stop game functionality 
+The goal is to reach maximum score by putting tetrominos in the optimal orders and rows as soon as possible
+<br><br><br>
+**UpArrow**    spin    
+**L/R Arrows** move     
+**DownArrow**  place
